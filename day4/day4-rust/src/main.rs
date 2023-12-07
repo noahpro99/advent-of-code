@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-pub fn day4_p1(input: String) -> u32 {
+pub fn day4_p1(input: &String) -> u32 {
     let p1: u32 = input
         .lines()
         .map(|x| {
@@ -43,13 +43,12 @@ pub fn day4_p2() {
     // );
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let input = std::fs::read_to_string("d4.txt").unwrap();
-        assert_eq!(day4_p1(input), 24160);
-    }
+pub fn main() {
+    let input = std::fs::read_to_string("d4.txt").unwrap();
+    assert_eq!(day4_p1(&input), 24160);
+    let d1 = day4_p1(&input);
+    println!("Day 4 Part 1: {}", d1);
+    // let d2 = day4_p2(input);
+    // println!("Day 4 Part 2: {}", d2);
+    
 }
