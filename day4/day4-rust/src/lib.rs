@@ -1,7 +1,6 @@
-use std::{collections::{HashMap, HashSet}, fmt::Debug};
+use std::collections::HashSet;
 
-fn main() {
-    let input = std::fs::read_to_string("d4.txt").unwrap();
+pub fn day4_p1(input: String) -> u32 {
     let p1: u32 = input
         .lines()
         .map(|x| {
@@ -18,8 +17,10 @@ fn main() {
         })
         .map(|x| if x == 0 { 0 } else { 2u32.pow(x as u32 - 1) })
         .sum();
-    dbg!(p1);
+    return p1;
+}
 
+pub fn day4_p2() {
     // let p2 = input.lines().enumerate().fold(
     //     HashMap::new(),
     //     |mut acc: HashMap<&str, HashSet<&str>>, (i, x)| {
@@ -40,5 +41,15 @@ fn main() {
     //             acc
     //     },
     // );
+}
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let input = std::fs::read_to_string("d4.txt").unwrap();
+        assert_eq!(day4_p1(input), 24160);
+    }
 }
