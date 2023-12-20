@@ -1,30 +1,37 @@
 use itertools::Itertools;
 use std::collections::HashMap;
 
-fn combos(p: &str, n: &[usize], cache: &mut HashMap<(Box<str>, Box<[usize]>), i32>) -> i32 {
-    if p.len() == 0 {
-        return if n.len() == 0 { 1 } else { 0 };
+fn combos(p: &str, n: &[usize], cache: &mut HashMap<(Box<str>, Box<[usize]>), u64>) -> u64 {
+    if p.is_empty() {
+        return if n.is_empty() { 1 } else { 0 };
     }
-    if n.len() == 0 {
-        return if p.find('#').is_none() { 1 } else { 0 };
+    if n.is_empty() {
+        return if !p.contains('#') { 1 } else { 0 };
     }
 
     let key = (p.into(), n.into());
-    if let Some(c) = cache.get(&key) {
-        return *c;
+    if let Some(&c) = cache.get(&key) {
+        return c;
     }
 
     let mut count = 0;
-    if p.chars().next().unwrap() != '#' {
-        count += combos(&p[1..], &n, cache);
+    if p.starts_with(|c| c == '.' || c == '?') {
+        count += combos(&p[1..], n, cache);
     }
-    if p.chars().next().unwrap() != '.' {
-        let p_chars: Vec<char> = p.chars().collect(); // Convert p to a vector of characters
-        if n[0] <= p_chars.len()
-            && p_chars[0..n[0]].iter().all(|&c| c != '#')
-            && (n[0] == p_chars.len() || p_chars[n[0]] != '#')
+    if p.starts_with(|c| c == '#' || c == '?') {
+        if n[0] <= p.len()
+            && !p[..n[0]].contains('.')
+            && (n[0] == p.len() || p.chars().nth(n[0]) != Some('#'))
         {
-            count += combos(&p[(n[0])..], &n[1..], cache);
+            count += combos(
+                if n[0] == p.len() {
+                    ""
+                } else {
+                    &p[(n[0] + 1)..]
+                },
+                &n[1..],
+                cache,
+            );
         }
     }
     cache.insert(key, count);
@@ -56,7 +63,7 @@ fn main() {
         });
 
     let p1_combos = parsed.clone().map(|(p, n)| combos(&p, &n, &mut cache));
-    let p1 = p1_combos.sum::<i32>();
+    let p1 = p1_combos.sum::<u64>();
     println!("Part 1: {}", p1);
 
     let p2_combos = parsed
@@ -69,6 +76,6 @@ fn main() {
         })
         .map(|(p, n)| combos(&p, &n, &mut cache));
 
-    let p2 = p2_combos.sum::<i32>();
+    let p2 = p2_combos.sum::<u64>();
     println!("Part 2: {}", p2);
 }
