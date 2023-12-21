@@ -87,10 +87,8 @@ fn energized(input: Vec<Vec<char>>, start: Beam) -> i32 {
     frontier.push(start.clone());
 
     while let Some(beam) = frontier.pop() {
-        // dbg!(&beam);
         let next_pos = beam.next_coords();
         if !inside_grid(next_pos, &input) {
-            // dbg!("Outside grid");
             continue;
         }
         Tile::from_char(input[next_pos.0 as usize][next_pos.1 as usize])
@@ -101,7 +99,6 @@ fn energized(input: Vec<Vec<char>>, start: Beam) -> i32 {
                     dir: next_beam.clone(),
                     pos: next_pos,
                 };
-                // dbg!(&next);
                 if !seen.contains(&next) {
                     frontier.push(next.clone());
                     seen.insert(next.clone());
