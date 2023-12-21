@@ -38,6 +38,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "day15-rust"
+version = "0.1.0"
+dependencies = [
+ "itertools",
+]
+
+[[package]]
 name = "day4-rust"
 version = "0.1.0"
 
