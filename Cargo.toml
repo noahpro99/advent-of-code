@@ -13,6 +13,7 @@ members = [
     "day9/day9-rust",
     "day11-galaxies/day11-rust",
     "day12-hot-springs/day12-rust",
+    "day13-mirrors/day13-rust",
 ]
 
 [dependencies]
