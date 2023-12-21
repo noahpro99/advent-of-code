@@ -1,11 +1,23 @@
 use itertools::Itertools;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
+#[derive(Hash, Eq, PartialEq, Debug, Clone)]
 enum Direction {
     Up,
     Down,
     Left,
     Right,
+}
+
+impl Direction {
+    fn next_coords(&self, pos: (i32, i32)) -> (i32, i32) {
+        match self {
+            Direction::Up => (pos.0 - 1, pos.1),
+            Direction::Down => (pos.0 + 1, pos.1),
+            Direction::Left => (pos.0, pos.1 - 1),
+            Direction::Right => (pos.0, pos.1 + 1),
+        }
+    }
 }
 
 enum Tile {
@@ -29,7 +41,7 @@ impl Tile {
     }
 
     fn next_beams(&self, dir: Direction) -> Vec<Direction> {
-        match (&self, dir) {
+        match (&self, &dir) {
             (Tile::Empty, _) => vec![dir],
             (Tile::ForwardSlash, Direction::Up) => vec![Direction::Right],
             (Tile::ForwardSlash, Direction::Down) => vec![Direction::Left],
@@ -51,20 +63,54 @@ impl Tile {
     }
 }
 
+#[derive(Hash, Eq, PartialEq, Debug, Clone)]
 struct Beam {
     dir: Direction,
     pos: (i32, i32),
 }
 
+impl Beam {
+    fn next_coords(&self) -> (i32, i32) {
+        self.dir.next_coords(self.pos)
+    }
+}
 
-fn part1(input: Vec<Vec<char>>) -> i32 {
-    let mut energized = HashMap::new();
+fn inside_grid(pos: (i32, i32), grid: &Vec<Vec<char>>) -> bool {
+    pos.0 >= 0 && pos.0 < grid.len() as i32 && pos.1 >= 0 && pos.1 < grid[0].len() as i32
+}
+
+fn energized(input: Vec<Vec<char>>, start: Beam) -> i32 {
+    let mut energized = HashSet::new();
     let mut seen = HashSet::new();
     let mut frontier = Vec::new();
-    seen.append(())
 
+    frontier.push(start.clone());
+
+    while let Some(beam) = frontier.pop() {
+        // dbg!(&beam);
+        let next_pos = beam.next_coords();
+        if !inside_grid(next_pos, &input) {
+            // dbg!("Outside grid");
+            continue;
+        }
+        Tile::from_char(input[next_pos.0 as usize][next_pos.1 as usize])
+            .next_beams(beam.dir)
+            .iter()
+            .for_each(|next_beam| {
+                let next = Beam {
+                    dir: next_beam.clone(),
+                    pos: next_pos,
+                };
+                // dbg!(&next);
+                if !seen.contains(&next) {
+                    frontier.push(next.clone());
+                    seen.insert(next.clone());
+                    energized.insert(next.pos.clone());
+                }
+            });
+    }
+    energized.len() as i32
 }
-    
 
 fn main() {
     let file: String = std::env::args()
@@ -73,8 +119,43 @@ fn main() {
         .expect("No file given")
         .to_string();
     let input = std::fs::read_to_string(file).expect("Something went wrong reading the file");
+    let parsed = input
+        .split('\n')
+        .map(|x| x.chars().collect_vec())
+        .collect_vec();
+    let p1 = energized(
+        parsed.clone(),
+        Beam {
+            dir: Direction::Right,
+            pos: (0, -1),
+        },
+    );
+    println!("Part 1: {}", p1);
 
-    let p1 = part1(input.split('\n').map(|x| x.chars().collect_vec()).collect_vec());
-    // println!("Part 1: {}", p1);
+    // let p2 be max when you start anywhere on the outside
+    let starts = (0..parsed.len() as i32)
+        .map(|x| Beam {
+            dir: Direction::Right,
+            pos: (x, -1),
+        })
+        .chain((0..parsed.len() as i32).map(|x| Beam {
+            dir: Direction::Left,
+            pos: (x, parsed[0].len() as i32),
+        }))
+        .chain((0..parsed[0].len() as i32).map(|x| Beam {
+            dir: Direction::Down,
+            pos: (-1, x),
+        }))
+        .chain((0..parsed[0].len() as i32).map(|x| Beam {
+            dir: Direction::Up,
+            pos: (parsed.len() as i32, x),
+        }))
+        .collect_vec();
 
+    let p2 = starts
+        .iter()
+        .map(|x| energized(parsed.clone(), x.clone()))
+        .max()
+        .unwrap();
+    println!("Part 2: {}", p2);
 }
