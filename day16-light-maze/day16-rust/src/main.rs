@@ -129,7 +129,6 @@ fn main() {
     );
     println!("Part 1: {}", p1);
 
-    // let p2 be max when you start anywhere on the outside
     let starts = (0..parsed.len() as i32)
         .map(|x| Beam {
             dir: Direction::Right,
