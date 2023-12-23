@@ -17,6 +17,7 @@ members = [
     "day15-lens-library/day15-rust",
     "day16-light-maze/day16-rust",
     "day17-crucible/day17-rust",
+    "day18-lavaduct-lagoon/day18-rust",
 ]
 
 [dependencies]
