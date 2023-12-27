@@ -380,16 +380,6 @@ fn main() {
         &workflows,
     );
     println!("Part 2: {}", p2);
-
-    // let test_rule = Rule {
-    //     category: Category::X,
-    //     comparison: Comparison::LessThan,
-    //     value: 4000,
-    //     result: RuleResult::Accept,
-    // };
-    // // split the part range by the test rule
-    // let split = split_part_range(&part_range, &test_rule);
-    // dbg!(split);
 }
 
 fn product_accepted(
@@ -402,21 +392,16 @@ fn product_accepted(
         RuleResult::Reject => 0,
         RuleResult::Next(next) => {
             let mut sum = 0;
-            // for each rule sum its product_accepted of the subset of the part range that falls under the rule
             let workflow = workflows.get(next.as_str()).unwrap().as_ref().unwrap();
             let mut parts = parts.clone();
             for rule in &workflow.rules {
-                // check if it falls under the rule if so clone and make the range smaller to fit the rule and then recurse
                 let (outside, inside) = split_part_range(&parts, rule);
-                // the inside part gets mapped to the result of the rule
                 if let Some(inside) = inside {
                     sum += product_accepted(&inside, Box::new(&rule.result), &workflows);
                 }
-                // the outside part is the new parts
                 if let Some(outside) = outside {
                     parts = outside;
                 } else {
-                    // if the outside part is none then the whole part is under the rule and we can stop
                     return sum;
                 }
             }
@@ -430,7 +415,6 @@ fn product_accepted(
 ///
 /// (outside, inside)
 fn split_part_range(parts: &PartRange, rule: &Rule) -> (Option<PartRange>, Option<PartRange>) {
-    // (part range that falls outside the rule, part range that falls under the rule)
     let mut outside: Option<PartRange> = None;
     let mut inside: Option<PartRange> = None;
     let category = &rule.category;
