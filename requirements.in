@@ -4,3 +4,4 @@ scipy
 ipykernel
 pip
 plotly
+tqdm
