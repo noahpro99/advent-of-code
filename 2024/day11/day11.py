@@ -22,7 +22,7 @@ f = open("input.txt").read().splitlines()
 cache = {}
 stones = [int(x) for x in f[0].split()]
 final_stones = [blink(stone, 0) for stone in stones]
-print(final_stones)
+print(sum(final_stones))
 
 # 186203
 # 221291560078593
