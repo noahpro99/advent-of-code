@@ -40,3 +40,4 @@ for t in range(1, 100000):
             * sum([1 for r in robots if r[0][0] < Y // 2 and r[0][1] > X // 2])
             * sum([1 for r in robots if r[0][0] > Y // 2 and r[0][1] > X // 2])
         )
+# 225648864 7847
