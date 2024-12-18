@@ -5,3 +5,6 @@ ipykernel
 pip
 plotly
 tqdm
+
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
