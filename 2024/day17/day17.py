@@ -1,4 +1,3 @@
-# %%
 f = open("input.txt").read()
 reg = {
     l.split(" ")[1].split(":")[0]: int(l.split(": ")[1])
@@ -8,8 +7,6 @@ inst = [
     int(x) for l in f.split("\n\n")[1].split("\n") for x in l.split(": ")[1].split(",")
 ]
 reg, inst
-
-# %%
 
 
 def run(reg, ins, p2=False) -> list | None:
@@ -58,35 +55,26 @@ def run(reg, ins, p2=False) -> list | None:
 
 print(",".join(str(x) for x in run(reg.copy(), inst)))
 
-# %%
-ans = 0
-b, c = 0, 0
-for i, ins in enumerate(inst):
-    a = 0
-    while True:
-        trial_reg = {"A": a, "B": b, "C": c}
-        out = run(trial_reg, inst, p2=True)
-        if isinstance(out, int) and out == ins:
-            print(i, a, b, c, out)
-            b = a
-            b ^= 2
-            c = a
-            b ^= 7
-            b ^= c
-            ans = 8 * ans + a
+frontier = [(i * 8 ** (len(inst) - 1), len(inst) - 1) for i in range(8)]
+a, b, c = 0, 0, 0
+while frontier:
+    guess_a, idx = frontier.pop(0)
+    must_match = inst[idx:]
+    out = run({"A": guess_a, "B": b, "C": c}, inst)
+    out_section = out[idx:]
+    if out_section == must_match:
+        if idx == 0:
+            a = guess_a
             break
-        a += 1
-    # if i == 2:
-    #     break
-# convert back to decimal
-print(ans, oct(ans))
-test_reg = reg.copy()
-test_reg["A"] = 0o5325644676236017
-print(",".join(str(x) for x in run(test_reg, inst)))
-# 190615597431823 0o5325644676236017
-# %%
+        for i in range(8):
+            frontier.append((guess_a + i * 8 ** (idx - 1), idx - 1))
+print(a)
+assert (
+    ",".join(str(x) for x in run({"A": a, "B": b, "C": c}, inst))
+    == "2,4,1,2,7,5,0,3,1,7,4,1,5,5,3,0"
+)
 
-# 2,4 # B = A
+# 2,4 # B = A % 8
 # 1,2 # B ^= 2
 # 7,5 # C = A
 # 0,3 # A = A // 2^3
@@ -94,19 +82,3 @@ print(",".join(str(x) for x in run(test_reg, inst)))
 # 4,1 # B ^= C
 # 5,5 # out(B%8)
 # 3,0 # jmp 0 if A != 0
-
-
-def recreation(a, b, c):
-    out = []
-    while a != 0:
-        b = a
-        b ^= 2
-        c = a
-        a = a // 8
-        b ^= 7
-        b ^= c
-        out.append(b % 8)
-    return a, b, c, out
-
-
-recreation(0o7, 0, 0)
