@@ -15,26 +15,6 @@ dir_pad = [
 num_pad = [["7", "8", "9"], ["4", "5", "6"], ["1", "2", "3"], [None, "0", "A"]]
 
 
-def pad_dists(pad):
-    dists = {}
-    for x in range(len(pad)):
-        for y in range(len(pad[0])):
-            if pad[x][y] is None:
-                continue
-            for x2 in range(len(pad)):
-                for y2 in range(len(pad[0])):
-                    if pad[x2][y2] is None:
-                        continue
-                    dists[pad[x][y] + pad[x2][y2]] = abs(x - x2) + abs(y - y2)
-    return dists
-
-
-np_dists = pad_dists(num_pad)
-dp_dists = pad_dists(dir_pad)
-dp_dists, np_dists
-# %%
-
-
 def neighbors(cur, code):
     neighbors = []
     r1x, r1y, r2x, r2y, r3x, r3y, ans = cur
