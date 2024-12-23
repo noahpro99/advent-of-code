@@ -1,4 +1,3 @@
-# %%
 from itertools import product
 
 from tqdm import tqdm
@@ -9,10 +8,8 @@ X, Y = len(f[0]), len(f)
 grid = [[char for c, char in enumerate(row)] for r, row in enumerate(f)]
 start = [(r, c) for r in range(Y) for c in range(X) if grid[r][c] == "S"][0]
 end = [(r, c) for r in range(Y) for c in range(X) if grid[r][c] == "E"][0]
-grid, start, end
 
 
-# %%
 def shortest_path(grid, start, end, cheats=False, cheat_set=None):
     frontier = [(start, (start,))]
     visited = set()
@@ -39,7 +36,8 @@ def shortest_path(grid, start, end, cheats=False, cheat_set=None):
 
 path = shortest_path(grid, start, end)
 
-p1 = 0
+p1, p2 = 0, 0
+path_set = set(path)
 for r, c in tqdm(path):
     for rr, cc in [(0, 2), (0, -2), (2, 0), (-2, 0)]:
         new_r, new_c = r + rr, c + cc
@@ -47,18 +45,12 @@ for r, c in tqdm(path):
             (r, c)
         ) + 100 + 2:
             p1 += 1
-
-print(p1)
-
-p2 = 0
-for r, c in tqdm(path):
     for rr, cc in product(range(-20, 21), range(-20, 21)):
         new_r, new_c = r + rr, c + cc
-        if (new_r, new_c) in path and path.index((new_r, new_c)) >= path.index(
+        abs_dist = abs(rr) + abs(cc)
+        if abs_dist > 20:
+            continue
+        if (new_r, new_c) in path_set and path.index((new_r, new_c)) >= path.index(
             (r, c)
-        ) + 100 + 2:
+        ) + 100 + abs_dist:
             p2 += 1
-
-print(p2)
-
-# %%
