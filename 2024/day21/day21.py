@@ -1,112 +1,83 @@
-# %%
-import sys
+from functools import lru_cache
 
-sys.setrecursionlimit(int(1e6))
-
-f = open("ex.txt").read().splitlines()
-f
-# %%
+f = open("input.txt").read().splitlines()
 
 dir_pad = [
-    [None, (-1, 0, 0), (0, 0, 1)],
-    [(0, -1, 0), (1, 0, 0), (0, 1, 0)],
+    [None, "^", "A"],
+    ["<", "v", ">"],
 ]
 
-num_pad = [["7", "8", "9"], ["4", "5", "6"], ["1", "2", "3"], [None, "0", "A"]]
+num_pad = [
+    ["7", "8", "9"],
+    ["4", "5", "6"],
+    ["1", "2", "3"],
+    [None, "0", "A"],
+]
 
 
-def neighbors(cur, code):
-    neighbors = []
-    r1x, r1y, r2x, r2y, r3x, r3y, ans = cur
-    # robots 1 and 2 are on dir_pad and robot 3 is on num_pad
-    for dx, dy, da, ds in [
-        (0, 1, 0, ">"),
-        (1, 0, 0, "v"),
-        (0, -1, 0, "<"),
-        (-1, 0, 0, "^"),
-        (0, 0, 1, "A"),
-    ]:
-        if da == 1:
-            b1x, b1y, b1a = dir_pad[r1x][r1y]
-            if b1a == 1:
-                b2x, b2y, b2a = dir_pad[r2x][r2y]
-                if b2a == 1:
-                    button3 = num_pad[r3x][r3y]
-                    need_to_press = code[len(ans)]
-                    print(button3, need_to_press)
-                    if button3 != need_to_press:
-                        continue
-                    neighbors.append(
-                        ((r1x, r1y, r2x, r2y, r3x, r3y, (*ans, button3)), ds)
-                    )
-                else:
-                    r3x_new, r3y_new = r2x + b2x, r2y + b2y
-                    if (
-                        not (0 <= r3x_new < 4 and 0 <= r3y_new < 3)
-                        or num_pad[r3x_new][r3y_new] is None
-                    ):
-                        continue
-                    neighbors.append(((r1x, r1y, r2x, r2y, r3x_new, r3y_new, ans), ds))
-            else:
-                r2x_new, r2y_new = r2x + b1x, r2y + b1y
-                if (
-                    not (0 <= r2x_new < 2 and 0 <= r2y_new < 3)
-                    or dir_pad[r2x_new][r2y_new] is None
-                ):
-                    continue
-                neighbors.append(((r1x, r1y, r2x_new, r2y_new, r3x, r3y, ans), ds))
-        else:
-            r1x_new, r1y_new = r1x + dx, r1y + dy
-            if (
-                not (0 <= r1x_new < 2 and 0 <= r1y_new < 3)
-                or dir_pad[r1x_new][r1y_new] is None
-            ):
-                continue
-            neighbors.append(((r1x_new, r1y_new, r2x, r2y, r3x, r3y, ans), ds))
-    return neighbors
-
-
-p = False
-
-
-def shortest_to(s, code):
-    frontier = [(s, ())]
-    visited = set()
-    while frontier:
-        cur, path = frontier.pop(0)
-        if cur in visited:
+def all_best_paths(start, end, grid):
+    queue, visited = [(start, ())], {}
+    all_best_paths = []
+    while queue:
+        cur, path = queue.pop(0)
+        if cur in visited and len(path) > visited[cur]:
             continue
-        if cur == code:
-            return path
-        visited.add(cur)
-        print(cur)
-
-        if p:
-            # print three grids to show where all the robots are
-            print_dir_pad_1 = [[dir_pad[x][y] for y in range(3)] for x in range(2)]
-            print_dir_pad_2 = [[dir_pad[x][y] for y in range(3)] for x in range(2)]
-            print_num_pad = [[num_pad[x][y] for y in range(3)] for x in range(4)]
-            r1x, r1y, r2x, r2y, r3x, r3y, ans = cur
-            print_dir_pad_1[r1x][r1y] = "R1"
-            print_dir_pad_2[r2x][r2y] = "R2"
-            print_num_pad[r3x][r3y] = "R3"
-            print("\n\n", path, visited)
-            for row in print_dir_pad_1:
-                print(row)
-            for row in print_dir_pad_2:
-                print(row)
-            for row in print_num_pad:
-                print(row)
-
-        for n, ds in neighbors(cur, code):
-            frontier.append((n, (*path, ds)))
-
-    raise ValueError("No path found")
+        visited[cur] = len(path)
+        if cur == end:
+            if len(all_best_paths) == 0 or len(path) <= len(all_best_paths[0]):
+                all_best_paths.append(path)
+            continue
+        x, y = cur
+        for dx, dy, ds in [(0, 1, ">"), (1, 0, "v"), (0, -1, "<"), (-1, 0, "^")]:
+            new_x, new_y = x + dx, y + dy
+            if (
+                0 <= new_x < len(grid)
+                and 0 <= new_y < len(grid[new_x])
+                and grid[new_x][new_y] is not None
+            ):
+                queue.append(((new_x, new_y), (*path, ds)))
+    return tuple(all_best_paths)
 
 
-for code in f:
-    # all start on A button
-    path = shortest_to((0, 2, 0, 2, 3, 2, ""), code)
-    print(code, "".join(path[1:]))
+def shortest_paths(pad):
+    paths = {}
+    for i, row in enumerate(pad):
+        for j, cell in enumerate(row):
+            if cell is None:
+                continue
+            for i2, row2 in enumerate(pad):
+                for j2, cell2 in enumerate(row2):
+                    if cell2 is None:
+                        continue
+                    path = all_best_paths((i, j), (i2, j2), pad)
+                    if path is not None:
+                        paths[cell + cell2] = path
+    return paths
 
-# %%
+
+def min_presses_num_pad(number):
+    @lru_cache
+    def min_to_go_and_press(depth, path):
+        if depth == 0:
+            return len(path) + 1
+        tot = 0
+        for d, d2 in zip(("A", *path), (*path, "A")):
+            all_d_paths = d_paths[d + d2]
+            tot += min([min_to_go_and_press(depth - 1, p) for p in all_d_paths])
+        return tot
+
+    n_paths = shortest_paths(num_pad)
+    d_paths = shortest_paths(dir_pad)
+    total = 0
+    for code in f:
+        presses = 0
+        for n, n2 in zip("A" + code, code):
+            all_n_paths = n_paths[n + n2]
+            new = min([min_to_go_and_press(number, p) for p in all_n_paths])
+            presses += new
+        total += presses * int("".join([d for d in code if d.isdigit()]))
+    return total
+
+
+print(min_presses_num_pad(2))
+print(min_presses_num_pad(25))
