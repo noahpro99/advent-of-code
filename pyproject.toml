@@ -1,0 +1,7 @@
+[project]
+name = "advent-of-code"
+version = "0.1.0"
+description = "My solutions to Advent of Code challenges"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["tqdm>=4.67.1"]
