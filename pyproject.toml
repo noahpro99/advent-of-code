@@ -4,4 +4,10 @@ version = "0.1.0"
 description = "My solutions to Advent of Code challenges"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["tqdm>=4.67.1"]
+dependencies = [
+    "jupyter>=1.1.1",
+    "notebook>=7.5.0",
+    "pip>=25.3",
+    "tqdm>=4.67.1",
+    "ipykernel>=6.29.5",
+]
