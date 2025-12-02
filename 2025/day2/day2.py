@@ -6,35 +6,12 @@ f = [
 
 p1, p2 = 0, 0
 
-
-def is_sym(x):
-    d = str(x)
-    if len(d) % 2 != 0:
-        return False
-    for i in range(len(d) // 2):
-        if d[i] != d[len(d) // 2 + i]:
-            return False
-    return True
-
-
-def is_sym_2(x):
-    d = str(x)
-    for l in range(1, (len(d) // 2) + 1):
-        works = True
-        for i in range(1, len(d) // l):
-            if len(d) % l != 0 or d[0:l] != d[l * i : l * (i + 1)]:
-                works = False
-                break
-        if works:
-            return True
-    return False
-
-
-for x in f:
-    for i in range(x[0], x[1] + 1):
-        if is_sym(i):
-            p1 += i
-        if is_sym_2(i):
-            p2 += i
+for start, end in f:
+    for x in range(start, end + 1):
+        s = str(x)
+        if len(s) % 2 == 0 and s[: len(s) // 2] == s[len(s) // 2 :]:
+            p1 += x
+        if s in (s + s)[1:-1]:
+            p2 += x
 
 print(p1, p2)
