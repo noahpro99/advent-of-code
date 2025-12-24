@@ -32,6 +32,7 @@
               uv
               python
               pythonEnv
+              rust-analyzer
             ];
 
             shellHook = ''
