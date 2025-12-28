@@ -11,4 +11,5 @@ dependencies = [
     "tqdm>=4.67.1",
     "ipykernel>=6.29.5",
     "matplotlib>=3.10.7",
+    "scipy>=1.15.3",
 ]
